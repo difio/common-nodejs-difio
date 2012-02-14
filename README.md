@@ -1,4 +1,4 @@
-This is generic node.js a client side agent for monupco.com .
+This is a generic Node.js module used by monupco.com.
 
-Check the monupco-*-nodejs packages for usage, where * is the app vendor, e.g. dotCloud.
-
+If you want to install into your Node.js application see
+the monupco-<cloud_vendor>-nodejs packages for usage.
