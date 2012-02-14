@@ -1,0 +1,11 @@
+{	"name" : "common-nodejs-monupco"
+,	"description" : "Common module for Monupco node.js clients"
+,	"version" : "0.0.1"
+,	"author" : "Svetlozar Argirov <zarrro@gmail.com>"
+,	"repository": {
+		"type": "git",
+		"url": "git://github.com/monupco/common-nodejs-monupco.git"
+	}
+,	"main" : "monupco.js"
+,	"engines": { "node": "*" }
+}
