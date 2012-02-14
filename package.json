@@ -2,7 +2,7 @@
 ,	"description" : "Common module for Monupco node.js clients"
 ,	"version" : "0.0.1"
 ,	"author" : "Svetlozar Argirov <zarrro@gmail.com>"
-,	"homepage" : http://github.com/monupco/common-nodejs-monupco
+,	"homepage" : "http://github.com/monupco/common-nodejs-monupco"
 ,	"repository": {
 		"type": "git",
 		"url": "git://github.com/monupco/common-nodejs-monupco.git"
