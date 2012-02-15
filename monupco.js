@@ -24,6 +24,7 @@
 
 // dLog -  used for debug logging
 var dLog = function(){}
+var dependenciesDebug = false;
 
 // loadNpm() - load npm module.
 // 		Workaround the fact that for some unknow reason, by defaultnpm is installed in
@@ -95,7 +96,9 @@ function recurseDependencies(data, out) {
 	var dep = data.dependencies;
 	out = out || {};
 	for (var k in dep) {
-		dLog(">dep>["+k+"]=", dep[k]);
+		if(dependenciesDebug) {
+			dLog(">dep>["+k+"]=", dep[k]);
+		}
 		// Ignore all kind of not resolved dependencies
 		if (typeof dep[k] === "string") {
 			continue;
@@ -137,12 +140,17 @@ function listDependencies(cb) {
 //		cb - callback , if present called on error or success 
 function httpPost(options, json_data, cb) {
 	var https = require('https');
-	var req = https.request(options,function(res){
-		var resData = '';	
+	dLog("REQ TO: " + JSON.stringify(options));
+	var req = https.request(options);
+	req.on('response', function(res){
+		var resData = '';
+		dLog("RES_HANDLER: " + res);
 		res.on('data', function (chunk) {
+			dLog("RES_DATA: " + chunk);
 			resData += chunk;
 		});
 		res.on('end', function (chunk) {
+			dLog("RESPONSE[" + res.statusCode+"] "+ resData);
 			if( res.statusCode != 200 || (res.headers['content-type'].indexOf("application/json")!=0)) {
 				var errMsg  = "Error "+ res.statusCode + " while posting data to " + options.host +"\n";
 						errMsg += resData;
@@ -153,34 +161,42 @@ function httpPost(options, json_data, cb) {
 				}
 				return;
 			}
-
 			var response = JSON.parse(resData);
 			if(cb) {
 				cb(response,null);			
 			}
 		});
 	});
-
+	req.on('upgrade', function(res, socket, upgradeHead)){
+		console.log("POSTING got upgrade ... WTF? :", upgradeHead);
+	});
 	req.on('error', function (e) {
+	    dLog("Error while posting data:" + e);
 		throw new Error("Error while posting data:" + e);
 	});
 
 	dLog("POSTING: " + JSON.stringify(json_data));
 	req.write(encodeURI('json_data=' + JSON.stringify(json_data)));
 	req.end();
+	dLog("POSTING DONE: Waiting for response.");
+}
+
+function getDepsAsJSON(depData){
+	var postData = DATA_TEMPLATE;
+	var deps = [];
+	for(var i in depData){
+		dLog("DEP: [" + i + "]=" + JSON.stringify(depData[i]));
+		deps.push(depData[i]);
+	}
+	postData['installed'] = deps;
+	return postData;
 }
 
 // postToMonupco(cb) - send package info to monupco
 //		cb - callback , if present called on error or success 
 function postToMonupco(cb){
 	listDependencies(function(depData){
-		var postData = DATA_TEMPLATE;
-		var deps = [];
-		for(var i in depData){
-			dLog("DEP: [" + i + "]=" + JSON.stringify(depData[i]));
-			deps.push(depData[i]);
-		}
-		postData['installed'] = deps;
+		var postData = getDepsAsJSON(depData);
 		var options = {
 			host: MONUPCO_HOST,
 			path: MONUPCO_REGISTER_PATH,
@@ -195,16 +211,31 @@ module.exports.postToMonupco = postToMonupco;
 
 // Command line tool implementation
 function cli(){
+	var printJSON = false;
 	for(var i in process.argv) {
 		if(process.argv[i] == "--debug") {
 			dLog = function() {
 				console.log.apply(this, arguments);
 			}
 		}
+		if(process.argv[i] == "--dependenciesDebug") {
+			dependenciesDebug = true;
+		}
+		if(process.argv[i] == "--printJSON") {
+			printJSON = true;
+		}
 	}
 	process.on('uncaughtException', function (err) {
 		console.log(err.message);
 	});
+	if(printJSON){
+		listDependencies(function(depData){
+			var postData = getDepsAsJSON(depData);
+			console.log(JSON.stringify(postData));
+		});
+		return;
+	}
+	dLog("Monupco: Strating...");
 	try {
 		postToMonupco(function(result, error){
 			if(result) {
@@ -214,8 +245,10 @@ function cli(){
 			}
 		});
 	} catch(e) {
+	    console.log("Monupco client exception:");
 		console.log(e.message);
 	}
+	dLog("Monupco: Done!");
 }
 
 module.exports.cli = cli;
