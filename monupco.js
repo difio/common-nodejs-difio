@@ -75,7 +75,7 @@ var MONUPCO_REGISTER_PATH = "/application/register/";
 function configure(options) {
 	if(options.url) {
 		var url = require('url').parse(options.url);
-		MONUPCO_HOST = url.host;
+		MONUPCO_HOST = url.hostname;
 		MONUPCO_REGISTER_PATH = url.pathname;
 	}
 	for(var k in DATA_TEMPLATE){
@@ -144,7 +144,6 @@ function httpPost(options, json_data, cb) {
 	var req = https.request(options);
 	req.on('response', function(res){
 		var resData = '';
-		dLog("RES_HANDLER: " + res);
 		res.on('data', function (chunk) {
 			dLog("RES_DATA: " + chunk);
 			resData += chunk;
@@ -167,7 +166,7 @@ function httpPost(options, json_data, cb) {
 			}
 		});
 	});
-	req.on('upgrade', function(res, socket, upgradeHead)){
+	req.on('upgrade', function(res, socket, upgradeHead){
 		console.log("POSTING got upgrade ... WTF? :", upgradeHead);
 	});
 	req.on('error', function (e) {
@@ -197,11 +196,26 @@ function getDepsAsJSON(depData){
 function postToMonupco(cb){
 	listDependencies(function(depData){
 		var postData = getDepsAsJSON(depData);
+		var thisModule, vendorModule;
+		for(var k in depData){
+			if(k.indexOf('common-nodejs-monupco')==0){
+				thisModule = depData[k]['n'] + '/' + depData[k]['v'];
+			}
+			if(/monupco-(.*?)-nodejs/.test(k)){
+				vendorModule = depData[k]['n'] + '/' + depData[k]['v'];
+			}
+		}
 		var options = {
 			host: MONUPCO_HOST,
 			path: MONUPCO_REGISTER_PATH,
-			method: 'POST'
+			method: 'POST',
+			headers: {
+				'User-Agent' : 'common-nodejs-monupco'
+			}
 		};
+		if(thisModule || vendorModule){
+			options.headers['User-Agent'] = vendorModule + ' ' + thisModule;
+		}
 		httpPost(options, postData, cb)
 	});
 }
