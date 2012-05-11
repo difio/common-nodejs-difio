@@ -27,17 +27,28 @@ var dLog = function(){}
 var dependenciesDebug = false;
 
 // loadNpm() - load npm module.
-// 		Workaround the fact that for some unknow reason, by defaultnpm is installed in
-//  	directory which is not on require.paths
+// 		Workaround the fact that for some unknow reason, by default npm is installed in
+//  	directory which is not on require.paths and so it is not loadable with simple 'require'
 function loadNpm() {
 	var npm;
+	// Try to load npm from NODE_PATH, not very probable to succeed :)
 	try {
 		npm = require('npm');
 	} catch(e) {
 	}
+	var path = require("path");
+	// Try to load NPM from where nodejs install dir. This should work for all 0.6.x
+	// versions  and also some 0.4.x.
 	if(!npm) {
-		var path = require("path");
-
+		var p = path.join(process.execPath, "../../lib", "node_modules", "npm");
+		try {
+			npm = require(p);
+		} catch(e) {
+		}
+	}
+	// Try to find npm on the require paths, but only for versions < 0.6.x,
+	// since require.paths is missing in 0.6.x
+	if(!npm && (process.version.split('.')[1]<6) ) {
 		for(var i in require.paths) {
 			var p = require.paths[i];
 			if(path.basename(p) == "node") {
