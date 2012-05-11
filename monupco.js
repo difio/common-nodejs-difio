@@ -90,7 +90,7 @@ function configure(options) {
 		MONUPCO_REGISTER_PATH = url.pathname;
 	}
 	for(var k in DATA_TEMPLATE){
-		if(options[k]) {
+		if(options[k] != undefined) {
 			DATA_TEMPLATE[k] = options[k];
 		}
 	}
