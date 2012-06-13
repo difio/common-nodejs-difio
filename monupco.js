@@ -260,7 +260,7 @@ function cli(){
 		});
 		return;
 	}
-	dLog("Monupco: Strating...");
+	dLog("Monupco: Starting in dir " + process.cwd() + " ...");
 	try {
 		postToMonupco(function(result, error){
 			if(result) {
