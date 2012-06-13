@@ -1,6 +1,6 @@
 {	"name" : "common-nodejs-monupco"
 ,	"description" : "Common module for Monupco node.js clients"
-,	"version" : "0.0.3"
+,	"version" : "0.0.4"
 ,	"author" : "Svetlozar Argirov <zarrro@gmail.com>"
 ,	"homepage" : "http://github.com/monupco/common-nodejs-monupco"
 ,	"repository": {
