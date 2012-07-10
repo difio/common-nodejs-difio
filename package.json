@@ -1,12 +1,12 @@
-{	"name" : "common-nodejs-monupco"
-,	"description" : "Common module for Monupco node.js clients"
+{	"name" : "common-nodejs-difio"
+,	"description" : "Common module for Difio node.js clients"
 ,	"version" : "0.0.4"
 ,	"author" : "Svetlozar Argirov <zarrro@gmail.com>"
-,	"homepage" : "http://github.com/monupco/common-nodejs-monupco"
+,	"homepage" : "http://github.com/difio/common-nodejs-difio"
 ,	"repository": {
 		"type": "git",
-		"url": "git://github.com/monupco/common-nodejs-monupco.git"
+		"url": "git://github.com/difio/common-nodejs-difio.git"
 	}
-,	"main" : "monupco.js"
+,	"main" : "difio.js"
 ,	"engines": { "node": "*" }
 }

@@ -80,14 +80,14 @@ var DATA_TEMPLATE = {
 	  'installed' : [],
 };
 
-var MONUPCO_HOST = "monupco-otb.rhcloud.com";
-var MONUPCO_REGISTER_PATH = "/application/register/";
+var DIFIO_HOST = "difio-otb.rhcloud.com";
+var DIFIO_REGISTER_PATH = "/application/register/";
 
 function configure(options) {
 	if(options.url) {
 		var url = require('url').parse(options.url);
-		MONUPCO_HOST = url.hostname;
-		MONUPCO_REGISTER_PATH = url.pathname;
+		DIFIO_HOST = url.hostname;
+		DIFIO_REGISTER_PATH = url.pathname;
 	}
 	for(var k in DATA_TEMPLATE){
 		if(options[k] != undefined) {
@@ -202,26 +202,26 @@ function getDepsAsJSON(depData){
 	return postData;
 }
 
-// postToMonupco(cb) - send package info to monupco
+// postToDifio(cb) - send package info to Difio
 //		cb - callback , if present called on error or success 
-function postToMonupco(cb){
+function postToDifio(cb){
 	listDependencies(function(depData){
 		var postData = getDepsAsJSON(depData);
 		var thisModule, vendorModule;
 		for(var k in depData){
-			if(k.indexOf('common-nodejs-monupco')==0){
+			if(k.indexOf('common-nodejs-difio')==0){
 				thisModule = depData[k]['n'] + '/' + depData[k]['v'];
 			}
-			if(/monupco-(.*?)-nodejs/.test(k)){
+			if(/difio-(.*?)-nodejs/.test(k)){
 				vendorModule = depData[k]['n'] + '/' + depData[k]['v'];
 			}
 		}
 		var options = {
-			host: MONUPCO_HOST,
-			path: MONUPCO_REGISTER_PATH,
+			host: DIFIO_HOST,
+			path: DIFIO_REGISTER_PATH,
 			method: 'POST',
 			headers: {
-				'User-Agent' : 'common-nodejs-monupco'
+				'User-Agent' : 'common-nodejs-difio'
 			}
 		};
 		if(thisModule || vendorModule){
@@ -231,7 +231,7 @@ function postToMonupco(cb){
 	});
 }
 
-module.exports.postToMonupco = postToMonupco;
+module.exports.postToDifio = postToDifio;
 
 
 // Command line tool implementation
@@ -260,20 +260,20 @@ function cli(){
 		});
 		return;
 	}
-	dLog("Monupco: Starting in dir " + process.cwd() + " ...");
+	dLog("Difio: Starting in dir " + process.cwd() + " ...");
 	try {
-		postToMonupco(function(result, error){
+		postToDifio(function(result, error){
 			if(result) {
-				console.log("Monupco: " + result['message']);
+				console.log("Difio: " + result['message']);
 			} else {
-				console.log("Monupco: " + error);
+				console.log("Difio: " + error);
 			}
 		});
 	} catch(e) {
-	    console.log("Monupco client exception:");
+	    console.log("Difio client exception:");
 		console.log(e.message);
 	}
-	dLog("Monupco: Done!");
+	dLog("Difio: Done!");
 }
 
 module.exports.cli = cli;
