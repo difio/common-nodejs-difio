@@ -1,6 +1,6 @@
 {	"name" : "common-nodejs-difio"
 ,	"description" : "Common module for Difio node.js clients"
-,	"version" : "0.0.4"
+,	"version" : "2.0.0"
 ,	"author" : "Svetlozar Argirov <zarrro@gmail.com>"
 ,	"homepage" : "http://github.com/difio/common-nodejs-difio"
 ,	"repository": {
